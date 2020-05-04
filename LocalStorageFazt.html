@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+    crossorigin="anonymous">
+    <title>Document</title>
+</head>
+<body id="body">
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="#">Products App</a>
+    </nav>
+
+    <div class="container pt-5">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <form id="formtask">
+                            <div class="form-group">
+                                <input type="text" id="name" placeholder="Nombre del producto" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="texarea" placeholder="Nombre del producto" class="form-control">
+                            </div>
+                            <button class="btn btn-primary btn-block" id="save">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div id="contendorLocal"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        var formulario = document.querySelector('#formtask');
+        var body = document.querySelector('#body');
+
+        formulario.addEventListener('submit', miForm)
+
+        function miForm(e){
+            let title= document.getElementById('name').value;
+            let textarea=document.getElementById('texarea').value;
+
+            // Creamos un nuevo objeto
+            let task = {
+                title : title,
+                texarea : textarea
+            };
+            const localGet = localStorage.getItem('key')
+            if(localGet === null){
+                body.className ="bg-danger"; // PARA ASEGURAR QUE ESTE VACIO
+                let myArreglo =[]; // Nuevo arreglo vacio
+                myArreglo.push(task); // Llenamos el arrgle vacio con los nuevos datos con el metodo Push = EMpujar
+                // El local storage almacena solamente string por eso se transforma el arreglo => SET = GUARDAR
+                let myLocalStorage = localStorage.setItem('key',JSON.stringify(myArreglo)); 
+                // Almacenamos el local storage para verlo en la consola => Get = TRAER
+                let myLocalGet = localStorage.getItem('key');
+
+            }else{
+                let NewTask = JSON.parse(localStorage.getItem('key')); // Obtenemos las tareas antiguas
+                NewTask.push(task); // Actualizamos
+                localStorage.setItem('key',JSON.stringify(NewTask)); 
+                // console.log(myArreglo)
+            }
+            e.preventDefault();
+        }
+
+        (()=>{
+            
+          let traerLocalStorage =  JSON.parse(localStorage.getItem('key'));
+          let contendorLocal = document.getElementById('contendorLocal');
+          for(let indice of traerLocalStorage){
+              let title=indice.title;
+              let description =indice.texarea;
+
+             contendorLocal.innerHTML += `
+             <div class="card mb-4">
+                <div class="card-body">
+                    <p>${title} - ${description}</p>
+                    <a class="btn btn-danger" name="delete" onclick="deleteFunction('${title}')">Boton</a>
+                </div>
+            </div>
+             `;  
+          }
+          
+        })();
+
+       function deleteFunction (title){
+        
+        let Task = JSON.parse(localStorage.getItem('key')); // Nos traemos el arreglo con los objetos
+            for (let myIndice of Task){
+                let titulo = myIndice.title; 
+                 if(titulo == title){ 
+                     console.log(titulo)
+                     Task.splice(myIndice,1)  
+            //     elemento.parentElement.parentElement.remove(); // Ubicamos el div padre      
+             }
+            }
+            localStorage.setItem('key',JSON.stringify(Task));
+        }
+    
+
+
+     
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+    crossorigin="anonymous">
+    <title>Document</title>
+</head>
+<body id="myBody">
+    <section class="container pt-5 text-center" id="Apires">
+        <div class="row" id="row">
+            <button class="btn btn-danger w-100" id="consumirApi">Consumir API Publica</button>
+        </div>
+        <div class="contenido pt-5 text-center">
+
+        </div>  
+        
+    </section>
+   
+    <div  class="container pt-5 text-center">
+        <div class="row">
+            <button class="btn btn-success w-100" onclick="jsonAPIS()">Traer Json</button>
+        </div>
+        <div class="contenido pt-5 text-center">
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Correo</th>
+                    <th scope="col">Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="jsonContenido">
+                  
+                </tbody>
+              </table>
+        </div> 
+    </div>
+
+    <script>
+
+        let array =[];
+        var contenido = document.querySelector('.contenido');
+        var ConsumirApis = document.querySelector('#consumirApi');
+        var myBody = document.querySelector('#myBody');
+        var section = document.querySelector('#Apires')
+
+        // Eventos 
+        ConsumirApis.addEventListener('click', consumirAPI);
+        document.addEventListener('DOMContentLoaded', ImprimirGet);
+
+        function ImprimirGet(){
+            contenido.innerHTML = '';
+            const myGet = JSON.parse(localStorage.getItem('key'));
+            console.log(myGet )
+            if(myGet === null){Mensaje('Local Storage Vacio!!!', 'danger');}
+            else{
+                console.log(myGet);
+                contenido.innerHTML +=`
+                    <img src="${myGet.picture.large}" widht='100px' class='img-fluid rounded-circle'>
+                    <p>Nombre:${myGet.name.first}</p>
+                    <p>Correo:${myGet.email}</p>
+                    <p>Telefono:${myGet.cell}</p>
+                    <a class="btn btn-warning w-50" name="delete">Delete</a>
+                `; 
+            }     
+        }
+        async function consumirAPI(e){
+            const $myFetch = await fetch('https://randomuser.me/api/').catch(Mensaje('Revisa tu conexión a internet', 'primary'))
+            const $myStatus = $myFetch.status;
+            const response = $myFetch.ok;
+            if(response === true){
+                const $myRes = await $myFetch.json();
+                Mensaje('Agregado con Exito!!!', 'success');
+                const data = $myRes.results['0'];
+                 GuardarDB(data);
+                 ImprimirGet()
+            }else{Mensaje('No encontrado', 'danger');}
+            console.log(e);
+        }
+
+        const Mensaje = (message, cssClas) =>{
+            const   div = document.createElement('div')
+            div.className='alert alert-' + cssClas;
+            div.appendChild(document.createTextNode(message));
+            const selectorPrincipal =document.querySelector('#Apires');
+            const App = document.querySelector('#row');
+            selectorPrincipal.insertBefore(div, App);
+
+            setTimeout(function(){
+                document.querySelector('.alert').remove(); // REmovemos todos los elementos con la clase alert
+            }, 3000)
+        }
+
+        const GuardarDB = (elemento)=>{
+            const valor = localStorage.setItem('key', JSON.stringify(elemento));
+            ImprimirGet();
+        }
+        const myDeleteFunctionDb =()=>{
+            const $myDeleteStorage = JSON.parse(localStorage.getItem('key'));
+        }
+        section.addEventListener('click', (e)=>{
+            console.log(e.path[0].name);
+            const $mybotonDelete = e.path[0].name;
+            if($mybotonDelete === 'delete'){
+                myDeleteFunctionDb();
+            }
+        });
+
+    </script>
+    
+    <script>
+        var jsonContenido = document.getElementById('jsonContenido');
+
+        function jsonAPIS(){
+            fetch('tabla.json')
+            .then(apiRes => apiRes.json())
+            .then(datas=>{
+               
+                (()=>{
+                    console.log(datas); // Arrays
+                    jsonContenido.innerHTML=``;
+                    for( let index of datas){
+                        console.log(index); // Se convirtio el array en objeto
+
+                        jsonContenido.innerHTML +=`
+                            <tr>
+                                <th scope="row">${index.id}</th>
+                                <td>${index.nombre}</td>
+                                <td>${index.email}</td>
+                                <td>${index.estado ? 'Activo' : 'Eliminado'}</td>
+                            </tr>
+                        `;
+                    }
+                })(datas);
+
+            })
+        }
+
+    </script>
+    
+</body>
+</html>

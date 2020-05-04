@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+    crossorigin="anonymous">
+    <title>Document</title>
+</head>
+<body id="body">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="#">Products App</a>
+    </nav>
+    <div class="container">
+        <div id="App" class="row pt-5">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Agregar un producto</h4>
+                    </div>
+                    <form id="product_form" class="card-body">
+                        <div class="form-group">
+                            <input type="text" id="name" placeholder="Nombre del producto" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <input type="text"  id="price" placeholder="Precio del producto" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <input type="number" id="year" placeholder="Año del producto" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="peso" placeholder="Peso del producto" class="form-control">
+                        </div>
+                        <input type="submit" value="save" class="btn btn-primary btn-block">
+                    </form>
+                </div>
+            </div>
+            <div id="product-list" class="col-md-8"></div> 
+        </div>
+    </div>
+
+    <section class="container pt-5">
+        <div class="row">
+            <button class="btn btn-dark" id="BtnBotones">Agregar Botones</button>
+        </div>
+    </section>
+    
+    <div class="container pt-5" id="contenedor-botones"> 
+    </div>
+
+    <script>
+
+        const BtnBotones = document.querySelector('#BtnBotones');
+        const botones = document.querySelector('#contenedor-botones');
+        const fondo =document.querySelector('#body');
+
+        (()=>{
+
+           BtnBotones.addEventListener('click', AgregarBotones);
+           botones.addEventListener('click', delegaciones);
+            
+        })();
+
+        (()=>{
+
+            const colorFondo = localStorage.getItem('colorFondo');
+            console.log(colorFondo);
+            if(colorFondo === null){
+                fondo.className="bg-success";
+            }else{
+                fondo.className=colorFondo;
+            }
+            
+        })();
+
+
+        function delegaciones(e){
+            
+            console.log(e.target.classList[1]);
+            const colorBoton =e.target.classList[1];
+
+            switch(colorBoton){
+                case('btn-primary'):
+                fondo.className='bg-primary';
+                localStorage.setItem('colorFondo','bg-primary');
+                break;  
+                case('btn-secondary'):
+                fondo.className='bg-secondary';
+                localStorage.setItem('colorFondo','bg-secondary');
+                break;
+                case('btn-danger'):
+                fondo.className='bg-danger';
+                localStorage.setItem('colorFondo','bg-danger');
+                break;
+                case('btn-warning'):
+                fondo.className='bg-warning';
+                localStorage.setItem('colorFondo','bg-warning');
+                break;
+                case('btn-dark'):
+                fondo.className='bg-dark';
+                localStorage.setItem('colorFondo','bg-dark');
+                break;
+            }
+        }
+
+        function AgregarBotones(e){
+            e.preventDefault();
+            botones.innerHTML=`
+            <button class="btn btn-primary">primary</button>
+            <button class="btn btn-secondary">secondary</button>
+            <button class="btn btn-danger">danger</button>
+            <button class="btn btn-warning">warning</button>
+            <button class="btn btn-dark">dark</button>
+            `;
+        }
+
+    </script>
+    <script>
+        class Product{
+            constructor(name, price, year, peso){
+                this.name=name;
+                this.price=price;
+                this.year=year;
+                this.peso=peso;
+            }
+        }
+        // Interfaz grafica (METODOS)
+        class UI{
+            addProduct(product){
+                const productList = document.getElementById('product-list'); // Elemento Padre
+                const element     = document.createElement('div'); // DIV contenedor => Elemento hijo
+                element.innerHTML=`
+
+                    <div class="card text-center mr-4">
+                        <div class="card-body">
+                            <strong>
+                                Nombre del Producto: ${product.name}
+                            </strong>
+                            <strong>
+                                Precio del producto: ${product.price}
+                            </strong>
+                            <strong>
+                                Año del producto: ${product.year}
+                            </strong>
+                            <strong>
+                                Peso del product kg: ${product.peso}
+                            </strong>
+                            <a href="#" class="btn btn-danger" name="delete">Delete</a>
+                        </div>
+                    </div>                   
+                `; 
+                productList.appendChild(element); // Le agregamos al elemento padre un elemento hijo 
+            }
+            resertForm(){
+                document.getElementById('product_form').reset()
+            }
+            deleteProduc(elemento){
+                // Comprobamos si el elemento recibido contiene el name="delete" que posee por defecto en el botón
+                 if(elemento.name === 'delete'){
+                    elemento.parentElement.parentElement.parentElement.remove(); // Ubicamos el div padre
+                    this.ShowMessage('Producto Eliminado', 'danger');
+                 }
+            }
+            ShowMessage(message, cssClass){
+                const div = document.createElement('div')
+                div.className='alert alert-' + cssClass;
+                div.appendChild(document.createTextNode(message));
+                const selectorPrincipal =document.querySelector('.container');
+                const App = document.querySelector('#App');
+                selectorPrincipal.insertBefore(div, App);
+
+                setTimeout(function(){
+                    document.querySelector('.alert').remove(); // REmovemos todos los elementos con la clase alert
+                }, 3000)
+            }
+        }
+        // EVENTOS DEL DOM
+        var form = document.getElementById('product_form');
+        var containerProducList = document.getElementById('product-list') 
+            // Capturamos el evento del formulario
+        form.addEventListener('submit', function (e) {
+            // Capturamos los valores introducidos por el usuario en el formulario
+            const name = document.getElementById('name').value;
+            const price = document.getElementById('price').value;
+            const year = document.getElementById('year').value;
+            const peso = document.getElementById('peso').value;
+            // console.log(name, price, year, peso);
+
+            console.log(new Product(name, price, year, peso));
+            const product = new Product(name, price, year, peso);
+            const ui = new UI();
+
+            // VERIFICAMOS SI EL FORMULARIO ESTA VACIO Y SI ESTA ENVIAMOS EL SIGUIENTE MENSAJE
+            if (name === '' || price === '' || year === '' || peso ==='' ){
+                return ui.ShowMessage('Por favor llene los campos del formulario', 'danger');
+            }
+
+            ui.addProduct(product);
+            ui.ShowMessage('producto agregado exitosamente', 'success');
+            ui.resertForm();
+            console.log(ui);
+            e.preventDefault(); // Evitamos que se envie el formulario por defecto
+        });
+        // Accedemos al DOM del contenedor product-list
+        containerProducList.addEventListener('click', function (e) {
+            // console.log(e.target)
+            const ui= new UI();
+            ui.deleteProduc(e.target);
+        });
+    </script>
+</body>
+</html>
