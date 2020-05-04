@@ -67,6 +67,7 @@
                 `; 
             }     
         }
+        // Consumiremos una API de manera Asincrona [Usando el async await]
         async function consumirAPI(e){
             const $myFetch = await fetch('https://randomuser.me/api/').catch(Mensaje('Revisa tu conexión a internet', 'primary'))
             const $myStatus = $myFetch.status;
@@ -80,11 +81,11 @@
             }else{Mensaje('No encontrado', 'danger');}
             console.log(e);
         }
-
+        // Con esta función mostraremos de manera dinamica un mensaje de exito ó error
         const Mensaje = (message, cssClas) =>{
-            const   div = document.createElement('div')
-            div.className='alert alert-' + cssClas;
-            div.appendChild(document.createTextNode(message));
+            const   div = document.createElement('div') // creamos un elemento div
+            div.className='alert alert-' + cssClas; // agregamos a este elemento div => una nueva class
+            div.appendChild(document.createTextNode(message)); 
             const selectorPrincipal =document.querySelector('#Apires');
             const App = document.querySelector('#row');
             selectorPrincipal.insertBefore(div, App);
