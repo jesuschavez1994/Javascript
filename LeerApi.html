@@ -52,7 +52,7 @@
         document.addEventListener('DOMContentLoaded', ImprimirGet);
 
         function ImprimirGet(){
-            contenido.innerHTML = '';
+            contenido.innerHTML = ''; // Limpiamos con un string vacio antes de insertar codigo con el innert.HTML => Para no generar errores
             const myGet = JSON.parse(localStorage.getItem('key'));
             console.log(myGet )
             if(myGet === null){Mensaje('Local Storage Vacio!!!', 'danger');}
